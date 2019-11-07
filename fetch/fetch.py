@@ -5,19 +5,23 @@ wikipedia.set_lang("en")
 
 
 class Fetcher:
+    """fetches wikipedia summaries for all passed triples and their entries (subj, pred, obj)"""
     triples = []
     path = "./corpus"  # relative from main.py
 
     @staticmethod
     def file(output_file):
+        """sets the file name for the corpus (relative to main.py)"""
         Fetcher.path = os.path.abspath(output_file)
 
     @staticmethod
     def add(triple: Triple):
+        """adds a triple, which should be processed on Fetcher.fetch() call"""
         Fetcher.triples.append(triple)
 
     @staticmethod
     def fetch():
+        """fetches wikipedia summaries for all passed triples and their entries (subj, pred, obj). Takes the first entry of a search on wikipedia"""
         with open(Fetcher.path, "a", encoding="utf_8") as corpus:
             while Fetcher.triples:
                 for item in Fetcher.triples.pop():
@@ -27,6 +31,7 @@ class Fetcher:
 
     @staticmethod
     def print():
+        """prints current triple queue"""
         if not Fetcher.triples:
             print("empty")
         for triple in Fetcher.triples:
