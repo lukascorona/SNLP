@@ -9,4 +9,4 @@ class Fetcher:
 
     def add(self, triple: Triple):
         self.triples.append(triple)
-        print(self.triples)
+        print(self.triples[-1])
