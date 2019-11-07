@@ -1,6 +1,9 @@
-class Predicate:
-    def __str__(self):
-        return type(self).__name__
+from .graph import Node
+
+
+class Predicate(Node):
+    def __init__(self):
+        self.name = type(self).__name__
 
 
 class LivesIn(Predicate):

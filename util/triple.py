@@ -10,3 +10,8 @@ class Triple:
 
     def __str__(self):
         return "{} -> {} -> {}".format(self.subject, self.predicate, self.object)
+
+    def __iter__(self):
+        yield self.subject
+        yield self.predicate
+        yield self.object

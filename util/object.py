@@ -1,9 +1,8 @@
-class Object:
-    def __init__(self, name: str):
-        self.name = name
+from .graph import Node
 
-    def __str__(self):
-        return self.name
+
+class Object(Node):
+    pass
 
 
 class Person(Object):
