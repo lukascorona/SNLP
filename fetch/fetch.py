@@ -3,10 +3,18 @@ from util.triple import Triple
 
 
 class Fetcher:
-    def __init__(self, output_file="../corpus"):
-        self.file = os.path.abspath(output_file)
-        self.triples = []
+    triples = []
+    path = "../corpus"
 
-    def add(self, triple: Triple):
-        self.triples.append(triple)
-        print(self.triples[-1])
+    @staticmethod
+    def file(output_file):
+        Fetcher.path = os.path.abspath(output_file)
+
+    @staticmethod
+    def add(triple: Triple):
+        Fetcher.triples.append(triple)
+
+    @staticmethod
+    def print():
+        for triple in Fetcher.triples:
+            print(triple)

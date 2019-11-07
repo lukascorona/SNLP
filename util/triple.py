@@ -10,7 +10,3 @@ class Triple:
 
     def __str__(self):
         return "{} -> {} -> {}".format(self.subject, self.predicate, self.object)
-
-    @staticmethod
-    def demo():
-        return Triple(Person(), LivesIn(), Location())
