@@ -12,6 +12,16 @@ class TxtToTriple:
 
     def processLine(line):
         """ Process line of txt.file """
-        """ TODO: find triples"""
+        """ TODO: find triples -> textTiTijeb + tokenToTriples"""
         triple = Triple("subject", "predicat", "object")
         triples.append(triple)
+
+	def textToToken():
+		"""TODO: mit spacy/ NLTK """
+		return ""
+
+	def tokenToTriples():
+		"""TODO: """
+		return ""
+
+
