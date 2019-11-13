@@ -1,1 +1,7 @@
 .vscode/settings.json
+/util/__pycache__/__init__.cpython-36.pyc
+/util/__pycache__/triple.cpython-36.pyc
+/util/__pycache__/predicate.cpython-36.pyc
+/util/__pycache__/object.cpython-36.pyc
+/util/__pycache__/graph.cpython-36.pyc
+/.vs
