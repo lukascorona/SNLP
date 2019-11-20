@@ -1,13 +1,9 @@
 from fetch.fetch import Fetcher
-from util.triple import Triple
-from util.predicate import LivesIn
-from util.object import Person, Location
-from txtToTriple.TxtToTriple import TxtToTriple
+from transform.TextToTriple import TextToTriple
 
 Fetcher.add(Triple(Person("Lukas"), LivesIn(), Location("Paderborn")))
 Fetcher.add(Triple(Person("Dirk"), LivesIn(), Location("Paderborn")))
 Fetcher.fetch()
 
-tokenizedLine = TxtToTriple.textToToken("Niclas lives in Paderborn")
-for token in tokenizedLine:
-    print(token.text, "-->",token.dep_,"-->", token.pos_)
+TextToTriple.text(
+    "Niclas lives in Paderborn. Dirk is born 1866").process().print()
