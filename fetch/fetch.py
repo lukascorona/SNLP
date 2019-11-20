@@ -19,6 +19,11 @@ class Fetcher:
         Fetcher.triples.append(triple)
 
     @staticmethod
+    def addAll(triples: list):
+        """adds a triple, which should be processed on Fetcher.fetch() call"""
+        Fetcher.triples += triples
+
+    @staticmethod
     def fetch():
         """fetches wikipedia summaries for all passed triples and their entries (subj, pred, obj). Takes the first entry of a search on wikipedia"""
         with open(Fetcher.path, "a", encoding="utf_8") as corpus:
