@@ -34,9 +34,16 @@ class TextToTriple:
 
         for doc in TextToTriple.documents:
             triple = [None, None, None]
-            for i in nlp(doc):
+            tokens = nlp(doc)
+            # for chunk in tokens.noun_chunks:
+            #     print("text: {}, root: {}, dep: {}, root head: {}".format(chunk.text, chunk.root.text, chunk.root.dep_,
+            #                                                               chunk.root.head.text))
+            # maybe we have to use https://spacy.io/usage/linguistic-features
+            for i in tokens:
                 if debug:
                     print(i.lemma_, i.pos_, i.tag_, i.dep_, i.ent_type_)
+                print(i.lemma_, [child for child in i.children], i.head.text,
+                      [child for child in i.head.children])
                 if i.pos_ in ["VERB"]:
                     triple[1] = i.lemma_
                 elif i.ent_type_ in ["PERSON", "ORG", "GPE", "LOC", "DATE"]:

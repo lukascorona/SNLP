@@ -4,5 +4,4 @@ from transform.TextToTriple import TextToTriple
 
 # Input.file("./SNLP2019_training.tsv").documents
 
-print(TextToTriple.tsv("./SNLP2019_training.tsv",  # 100
-                       ).process().triples)
+print(TextToTriple.tsv("./SNLP2019_training.tsv",  1).process().triples)
