@@ -15,42 +15,48 @@ class Similarity (Input):
             self._candidates.append(self.documents[current].lower().split())
             self._candidates_set.append(
                 set(self.documents[current].lower().split()))
-        for current in range(len(self._candidates)):
+
+        num_docs = len(self._candidates)
+        for current in range(num_docs):
             self._candidates_set[current]
-            for i, remain_a in enumerate(remaining_indexes):
-                for j, remain_b in enumerate(remaining_indexes):
+            best_i = best_j = 0
+            best_candidate_length = 0
+            for i in range(num_docs):
+                for j in range(num_docs):
+                    intersec_length = len(
+                        self._candidates_set[current] & self._candidates_set[i] & self._candidates_set[j])
+                    if self._candidates_set[current] != self._candidates_set[i] and \
+                            self._candidates_set[current] != self._candidates_set[j] and \
+                            self._candidates_set[i] != self._candidates_set[j] and \
+                            intersec_length > best_candidate_length and \
+                            self._candidates_set[current] & self._candidates_set[i] & self._candidates_set[j] != set(["is"]):
+                        best_candidate_length = intersec_length
+                        best_i = i
+                        best_j = j
 
-                    if i != -1 and j != -1 and \
-                            self._candidates_set[current] != self._candidates_set[remain_a] and \
-                            self._candidates_set[current] != self._candidates_set[remain_b] and \
-                            self._candidates_set[remain_a] != self._candidates_set[remain_b] and \
-                            len(self._candidates_set[current] & self._candidates_set[remain_a] & self._candidates_set[remain_b]) > 0 and \
-                            self._candidates_set[current] & self._candidates_set[remain_a] & self._candidates_set[remain_b] != set(["is"]):
+            sublist = []
+            last_inserted_word = None
+            for curr_index in range(len(self._candidates[current])):
+                word_curr = self._candidates[current][curr_index]
+                for word_rem_a in self._candidates[best_i]:
+                    for word_rem_b in self._candidates[best_j]:
+                        if word_curr == word_rem_a == word_rem_b:
 
-                        remaining_indexes[i] = remaining_indexes[j] = -1
-                        sublist = []
-                        last_inserted_word = None
-                        for curr_index in range(len(self._candidates[current])):
-                            word_curr = self._candidates[current][curr_index]
-                            for word_rem_a in self._candidates[remain_a]:
-                                for word_rem_b in self._candidates[remain_b]:
-                                    if word_curr == word_rem_a == word_rem_b:
+                            if curr_index != 0 and not sublist:
+                                sublist.append("(.*)")
 
-                                        if curr_index != 0 and not sublist:
-                                            sublist.append("(.*)")
+                            elif curr_index > 0 and last_inserted_word == self._candidates[current][curr_index - 1]:
+                                del sublist[-1]
 
-                                        elif curr_index > 0 and last_inserted_word == self._candidates[current][curr_index - 1]:
-                                            del sublist[-1]
+                            sublist.append(
+                                word_curr.replace(".", ""))
 
-                                        sublist.append(
-                                            word_curr.replace(".", ""))
+                            if not word_curr.endswith("."):
+                                sublist.append("(.*)")
 
-                                        if not word_curr.endswith("."):
-                                            sublist.append("(.*)")
+                            last_inserted_word = word_curr
 
-                                        last_inserted_word = word_curr
-
-                        self._regex.add(tuple(sublist))
+            self._regex.add(tuple(sublist))
         for reg in self._regex:
             self._regex_expressions.append(" ".join(list(reg)))
         #     reg_list = []
