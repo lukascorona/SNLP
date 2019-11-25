@@ -6,4 +6,4 @@ import pprint
 # Input.file("./SNLP2019_training.tsv").documents
 
 # pprint.pprint(TextToTriple.tsv("./SNLP2019_training.tsv",  300).regex().triples)
-TextToTriple.tsv("./SNLP2019_training.tsv",  300).regex().stats()
+TextToTriple().tsv("./SNLP2019_training.tsv",  300).regex().stats()

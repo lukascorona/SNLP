@@ -5,48 +5,25 @@ from spacy.symbols import nsubj, VERB
 import re
 
 
-class TextToTriple:
+class TextToTriple (Input):
     triples = []
-    documents = []
     statistics = {}
 
-    @staticmethod
-    def file(txtPath: str) -> 'TextToTriple':
-        """ Read textfile and adds them to the queue """
-        with open(txtPath, "r") as fobj:
-            for line in fobj:
-                TextToTriple.documents += line.split(".")
-        return TextToTriple
-
-    @staticmethod
-    def text(text: str) -> 'TextToTriple':
-        """ adds text in queue"""
-        TextToTriple.documents += text.split(".")
-        return TextToTriple
-
-    @staticmethod
-    def tsv(path: str, rows: int = None) -> 'TextToTriple':
-        """ adds text from tsvfile in queue"""
-        TextToTriple.documents += Input.tsv(path, rows).documents
-        return TextToTriple
-
     @DeprecationWarning
-    @staticmethod
-    def recursivePrint(token, depth):
+    def recursivePrint(self, token, depth):
         """ prints the linguistic parse tree """
         depth += 2
         for child in token.children:
             print(" " * depth, child.lemma_, child.dep_, child.pos_)
-            TextToTriple.recursivePrint(child, depth)
+            self.recursivePrint(child, depth)
 
     @DeprecationWarning
-    @staticmethod
-    def process(debug: bool = False):
+    def process(self, debug: bool = False):
         """ all documents """
         """ see https://spacy.io/api/annotation """
         nlp = spacy.load("en_core_web_sm")
 
-        for doc in TextToTriple.documents:
+        for doc in self.documents:
             triple = [None, None, None]
             tokens = nlp(doc)
             # for chunk in tokens.noun_chunks:
@@ -62,22 +39,21 @@ class TextToTriple:
                           child for child in i.head.children])
                 if i.pos in [VERB]:
                     triple[1] = i.lemma_
-                    TextToTriple.recursivePrint(i, 0)
+                    self.recursivePrint(i, 0)
                 # elif i.ent_type_ in ["PERSON", "ORG", "GPE", "LOC", "DATE"]:
                 #     if triple[1] == None:
                 #         triple[0] = i.lemma_
                 #     else:
                 #         triple[2] = i.lemma_
             if None not in triple:
-                TextToTriple.triples.append(triple)
-        return TextToTriple
+                self.triples.append(triple)
+        return self
 
-    @staticmethod
-    def regex(debug: bool = False):
+    def regex(self, debug: bool = False):
         """ find triples with regex expressions """
-        for doc in TextToTriple.documents:
+        for doc in self.documents:
             doc = doc.lower()
-            TextToTriple.regToTriple(doc, [
+            self.regToTriple(doc, [
                 [r"(.*) is (.*)'s nascence place", "born in"],
                 [r"(.*) is (.*) innovation place", "innovation place"],
                 [r"(.*) stars (.*)\.", "stars"],
@@ -92,31 +68,28 @@ class TextToTriple:
                 [r"(.*) is (.*)'s better half", "married to"],
                 [r"(.*)'s author is (.*)\.", "wrote"]
             ])
-        TextToTriple.statistics["found"] = round(
-            len(TextToTriple.triples) / (len(TextToTriple.documents)*2), 4)
-        return TextToTriple
+        self.statistics["found"] = round(
+            len(self.triples) / (len(self.documents)*2), 4)
+        return self
 
-    @staticmethod
-    def stats():
+    def stats(self):
         """ prints collected figures """
-        for key in TextToTriple.statistics:
-            print("{}: {}".format(key, TextToTriple.statistics[key]))
+        for key in self.statistics:
+            print("{}: {}".format(key, self.statistics[key]))
 
-    @staticmethod
-    def regToTriple(doc, expressions):
+    def regToTriple(self, doc, expressions):
         """ creates triples from a sentence. each triple is saves twice with subj and obj switched """
         for regex in expressions:
             tokens = list(re.findall(regex[0], doc))
             if tokens and len(tokens[0]) == 2:
-                TextToTriple.triples.append(
+                self.triples.append(
                     [tokens[0][0], regex[1], tokens[0][1]])
-                TextToTriple.triples.append(
+                self.triples.append(
                     [tokens[0][1], regex[1], tokens[0][0]])
 
-    @staticmethod
-    def print():
+    def print(self):
         """prints triples"""
-        if not TextToTriple.triples:
+        if not self.triples:
             print("empty")
-        for triple in TextToTriple.triples:
+        for triple in self.triples:
             print(triple)
