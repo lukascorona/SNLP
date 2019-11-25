@@ -1,6 +1,7 @@
 from input.input import Input
 import pprint
 import re
+from tqdm import tqdm
 
 
 class Similarity (Input):
@@ -10,69 +11,47 @@ class Similarity (Input):
     _regex_expressions = []
 
     def candidates(self):
-        remaining_indexes = list(range(len(self.documents)))
+        print(len(self.documents))
         for current in range(len(self.documents)):
             self._candidates.append(self.documents[current].lower().split())
             self._candidates_set.append(
                 set(self.documents[current].lower().split()))
 
         num_docs = len(self._candidates)
-        for current in range(num_docs):
-            self._candidates_set[current]
-            best_i = best_j = 0
-            best_candidate_length = 0
+        for current in tqdm(range(num_docs)):
+            best_intersection = 0
+            best_i = best_j = -1
             for i in range(num_docs):
                 for j in range(num_docs):
-                    intersec_length = len(
-                        self._candidates_set[current] & self._candidates_set[i] & self._candidates_set[j])
+                    # reihenfolge der wörter noch nicht bedacht, erst grobe aussortierung
                     if self._candidates_set[current] != self._candidates_set[i] and \
                             self._candidates_set[current] != self._candidates_set[j] and \
                             self._candidates_set[i] != self._candidates_set[j] and \
-                            intersec_length > best_candidate_length and \
+                            len(self._candidates_set[current] & self._candidates_set[i] & self._candidates_set[j]) > best_intersection and \
                             self._candidates_set[current] & self._candidates_set[i] & self._candidates_set[j] != set(["is"]):
-                        best_candidate_length = intersec_length
+                        best_intersection = len(
+                            self._candidates_set[current] & self._candidates_set[i] & self._candidates_set[j])
                         best_i = i
                         best_j = j
-
+            # jetzt mit reihenfolge bei kandidaten mit höchster überschneidung
             sublist = []
             last_inserted_word = None
-            for curr_index in range(len(self._candidates[current])):
-                word_curr = self._candidates[current][curr_index]
+            for curr_index, word_curr in enumerate(self._candidates[current]):
                 for word_rem_a in self._candidates[best_i]:
                     for word_rem_b in self._candidates[best_j]:
                         if word_curr == word_rem_a == word_rem_b:
-
                             if curr_index != 0 and not sublist:
                                 sublist.append("(.*)")
-
                             elif curr_index > 0 and last_inserted_word == self._candidates[current][curr_index - 1]:
                                 del sublist[-1]
-
                             sublist.append(
                                 word_curr.replace(".", ""))
-
                             if not word_curr.endswith("."):
                                 sublist.append("(.*)")
-
                             last_inserted_word = word_curr
-
             self._regex.add(tuple(sublist))
         for reg in self._regex:
             self._regex_expressions.append(" ".join(list(reg)))
-        #     reg_list = []
-        #     for word in reg:
-        #         reg_list.append(word.replace(".", "").replace("<s>", ""))
-        #     self._regex_expressions.append(
-        #         "".join(reg_list) + ("" if reg[-1].endswith(".") else " (.*)"))
-
-            # doc = set(doc.lower().split(" "))
-            # found_similar = False
-            # for i in range(len(self._candidates)):
-            #     if len(self._candidates[i] & doc) > 0 and self._candidates[i] & doc != set(["is"]):
-            #         found_similar = True
-            #         self._candidates[i] = self._candidates[i] & doc
-            # if not found_similar:
-            #     self._candidates.append(doc)
         return self
 
     def print(self):
