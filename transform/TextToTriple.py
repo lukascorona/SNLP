@@ -30,13 +30,16 @@ class TextToTriple:
         TextToTriple.documents += Input.tsv(path, rows).documents
         return TextToTriple
 
+    @DeprecationWarning
     @staticmethod
     def recursivePrint(token, depth):
+        """ prints the linguistic parse tree """
         depth += 2
         for child in token.children:
             print(" " * depth, child.lemma_, child.dep_, child.pos_)
             TextToTriple.recursivePrint(child, depth)
 
+    @DeprecationWarning
     @staticmethod
     def process(debug: bool = False):
         """ all documents """
@@ -71,6 +74,7 @@ class TextToTriple:
 
     @staticmethod
     def regex(debug: bool = False):
+        """ find triples with regex expressions """
         for doc in TextToTriple.documents:
             doc = doc.lower()
             TextToTriple.regToTriple(doc, [
@@ -94,11 +98,13 @@ class TextToTriple:
 
     @staticmethod
     def stats():
+        """ prints collected figures """
         for key in TextToTriple.statistics:
             print("{}: {}".format(key, TextToTriple.statistics[key]))
 
     @staticmethod
     def regToTriple(doc, expressions):
+        """ creates triples from a sentence. each triple is saves twice with subj and obj switched """
         for regex in expressions:
             tokens = list(re.findall(regex[0], doc))
             if tokens and len(tokens[0]) == 2:
