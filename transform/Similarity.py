@@ -7,6 +7,7 @@ from tqdm import tqdm
 
 class Candidate:
     def __init__(self, words, similarity):
+        Input.__init__(self)
         self.words = words
         self.sim = similarity
         self.index = 0
@@ -18,6 +19,7 @@ class Candidate:
 class Similarity (Input):
 
     def __init__(self):
+        Input.__init__(self)
         self._candidates = []
         self._candidates_set = []
         self._regex = set()
@@ -25,6 +27,7 @@ class Similarity (Input):
         self._entries = []
 
     def fetchEntities(self):
+        """ uses the regex expressions to create a list with all entities """
         for regex in self._regex_expressions:
             for doc in self.documents:
                 matches = re.findall(regex, doc)
@@ -39,6 +42,7 @@ class Similarity (Input):
         return self
 
     def candidates(self, num_compare_candidates=4, num_candidates=INFINITY, DEBUG=False):
+        """ creates regex expressions of the given file """
         for current in range(len(self.documents)):
             # preprocess sentences (no lower(), cause "Stars" and "stars" should be different)
             self._candidates.append(
@@ -117,13 +121,20 @@ class Similarity (Input):
         return self
 
     def printRegex(self):
+        """ prints regex expressions """
         pprint.pprint(self._regex_expressions)
 
     def printEntries(self):
+        """ prints entities found by regex expressions """
         pprint.pprint(self._entries)
 
-    def expressions(self):
+    def expressions(self, regex_exp=None):
+        """ if a list of expressions is given, this expressions will be used for entities fetching. if not, found expressions are returned """
+        if regex_exp != None:
+            self._regex_expressions = regex_exp
+            return self
         return self._regex_expressions
 
     def entries(self):
+        """ returns found entities """
         return self._entries

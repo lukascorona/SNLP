@@ -9,6 +9,9 @@ class TextToTriple (Input):
     triples = []
     statistics = {}
 
+    def __init__(self):
+        Input.__init__(self)
+
     @DeprecationWarning
     def recursivePrint(self, token, depth):
         """ prints the linguistic parse tree """

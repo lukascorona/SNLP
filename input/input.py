@@ -3,7 +3,11 @@ import csv
 
 class Input:
 
-    documents = []
+    def __init__(self):
+        self.documents = []
+        self.start = None
+        self.end = None
+        self.truth = []
 
     def file(self, txtPath: str) -> 'TextToTriple':
         """ Read textfile and adds them to the queue """
@@ -17,13 +21,16 @@ class Input:
         self.documents += text.split(".")
         return self
 
-    def tsv(self, path: str, rows: int = None):
+    def tsv(self, path: str):
         with open(path, encoding="utf-8") as csvfile:
             reader = csv.DictReader(csvfile, dialect='excel-tab')
-            for row in reader:
-                self.documents.append(row["Fact_Statement"])
-                if rows != None and len(self.documents) >= rows:
-                    break
+            if "True/False" in reader.fieldnames:
+                for row in reader:
+                    self.documents.append(row["Fact_Statement"])
+                    self.truth.append(row["True/False"])
+            else:
+                for row in reader:
+                    self.documents.append(row["Fact_Statement"])
         return self
 
     def print(self):
@@ -32,3 +39,8 @@ class Input:
             print("empty")
         for doc in self.documents:
             print(doc)
+
+    def __getitem__(self, val):
+        if type(val) is slice:
+            self.documents = self.documents[val]
+        return self
