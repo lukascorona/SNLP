@@ -1,43 +1,58 @@
 import os
 import wikipedia
+from tqdm import tqdm
 wikipedia.set_lang("en")
 
 
 class Fetcher:
     """fetches wikipedia summaries for all passed triples and their entries (subj, pred, obj)"""
-    triples = []
-    path = "./corpus"  # relative from main.py
 
-    @staticmethod
-    def file(output_file):
+    def __init__(self, path="./corpus"):
+        self.entries = []
+        self.path = path  # relative from main.py
+
+    def file(self, output_file):
         """sets the file name for the corpus (relative to main.py)"""
-        Fetcher.path = os.path.abspath(output_file)
+        self.path = os.path.abspath(output_file)
+        return self
 
-    @staticmethod
-    def add(triple: list):
-        """adds a triple, which should be processed on Fetcher.fetch() call"""
-        Fetcher.triples.append(triple)
+    def addTriple(self, triple: list):
+        """adds a triple, which should be processed on fetch() call"""
+        self.entries += triple
+        return self
 
-    @staticmethod
-    def addAll(triples: list):
-        """adds a triple, which should be processed on Fetcher.fetch() call"""
-        Fetcher.triples += triples
+    def addTriples(self, triples: list):
+        """adds triples, which should be processed on fetch() call"""
+        for triple in triples:
+            self.entries += triple
+        return self
 
-    @staticmethod
-    def fetch():
+    def add(self, entry):
+        """adds a single entry or list of entries, which should be processed on fetch() call"""
+        if type(entry) is list:
+            self.entries += entry
+        else:
+            self.entries.append(entry)
+        return self
+
+    def fetch(self):
         """fetches wikipedia summaries for all passed triples and their entries (subj, pred, obj). Takes the first entry of a search on wikipedia"""
-        with open(Fetcher.path, "a", encoding="utf_8") as corpus:
-            while Fetcher.triples:
-                triple = Fetcher.triples.pop()
-                for item in [triple[0], triple[2]]:
-                    pages = wikipedia.search(item)
-                    if pages:
+        with open(self.path, "a", encoding="utf_8") as corpus:
+            for item in tqdm(self.entries):
+                pages = wikipedia.search(item)
+                if pages:
+                    try:
                         corpus.write(wikipedia.summary(pages[0]) + "\n")
+                    except:
+                        print("error for {}, found pages: {}".format(item, pages))
+                        continue
+            self.entries = []
+        return self
 
-    @staticmethod
-    def print():
+    def print(self):
         """prints current triple queue"""
-        if not Fetcher.triples:
+        if not self.entries:
             print("empty")
-        for triple in Fetcher.triples:
-            print(triple)
+        for item in self.entries:
+            print(item)
+        return self

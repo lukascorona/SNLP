@@ -7,5 +7,6 @@ from transform.Similarity import Similarity
 # Input.file("./SNLP2019_training.tsv").documents
 
 #TextToTriple().tsv("./SNLP2019_training.tsv",  300).regex().stats()
-Similarity().tsv("./SNLP2019_training.tsv",
-                 200).candidates(8).print()
+entries = Similarity().tsv("./SNLP2019_training.tsv",
+                           200).candidates(8).fetchEntities().entries()
+Fetcher().add(entries).fetch()

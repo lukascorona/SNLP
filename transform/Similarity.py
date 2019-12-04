@@ -16,10 +16,27 @@ class Candidate:
 
 
 class Similarity (Input):
-    _candidates = []
-    _candidates_set = []
-    _regex = set()
-    _regex_expressions = []
+
+    def __init__(self):
+        self._candidates = []
+        self._candidates_set = []
+        self._regex = set()
+        self._regex_expressions = []
+        self._entries = []
+
+    def fetchEntities(self):
+        for regex in self._regex_expressions:
+            for doc in self.documents:
+                matches = re.findall(regex, doc)
+                if matches:
+                    if type(matches[0]) is tuple:
+                        for entry in matches[0]:
+                            self._entries.append(entry.replace(
+                                ".", "").replace("'s", ""))
+                    else:
+                        self._entries.append(matches[0].replace(
+                            ".", "").replace("'s", ""))
+        return self
 
     def candidates(self, num_compare_candidates=4, num_candidates=INFINITY, DEBUG=False):
         for current in range(len(self.documents)):
@@ -99,5 +116,14 @@ class Similarity (Input):
         print("skipped: {}".format(skipped))
         return self
 
-    def print(self):
+    def printRegex(self):
         pprint.pprint(self._regex_expressions)
+
+    def printEntries(self):
+        pprint.pprint(self._entries)
+
+    def expressions(self):
+        return self._regex_expressions
+
+    def entries(self):
+        return self._entries
