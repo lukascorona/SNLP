@@ -23,6 +23,5 @@ if mode is Mode.BUILD_CORPUS:
 elif mode is Mode.CHECK_FACTS:
     regex = Similarity().tsv(
         "./SNLP2019_training.tsv")[:200].candidates(8).expressions()
-    pprint.pprint(regex)
-
-    Facts().tsv("./SNLP2019_test.tsv")[:4].check(regex, "./corpus-04-12-2019")
+    Facts().tsv(
+        "./SNLP2019_training.tsv").check(regex, "./corpus-04-12-2019")

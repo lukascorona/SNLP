@@ -27,7 +27,7 @@ class Input:
             if "True/False" in reader.fieldnames:
                 for row in reader:
                     self.documents.append(row["Fact_Statement"])
-                    self.truth.append(row["True/False"])
+                    self.truth.append(float(row["True/False"]))
             else:
                 for row in reader:
                     self.documents.append(row["Fact_Statement"])
