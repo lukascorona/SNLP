@@ -12,16 +12,16 @@ class Mode(Enum):
     CHECK_FACTS = 2
 
 
-mode = Mode.CHECK_FACTS
+mode = Mode.BUILD_CORPUS
 
 # build corpus
 if mode is Mode.BUILD_CORPUS:
     entries = Similarity().tsv(
-        "./SNLP2019_training.tsv")[:200].candidates(8).fetchEntities().entries()
+        "./SNLP2019_training.tsv").generate_regex(compare=8).use_regex().entries()
     Fetcher().add(entries).fetch()
 
 elif mode is Mode.CHECK_FACTS:
     regex = Similarity().tsv(
-        "./SNLP2019_training.tsv")[:200].candidates(8).expressions()
+        "./SNLP2019_training.tsv")[:200].generate_regex(compare=8).expressions()
     Facts().tsv(
         "./SNLP2019_training.tsv").check(regex, "./corpus-04-12-2019")

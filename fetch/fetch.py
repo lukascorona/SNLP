@@ -1,5 +1,8 @@
+import sys
+from datetime import datetime
 import os
 import wikipedia
+from wikipedia.exceptions import PageError
 from tqdm import tqdm
 wikipedia.set_lang("en")
 
@@ -7,7 +10,7 @@ wikipedia.set_lang("en")
 class Fetcher:
     """fetches wikipedia summaries for all passed triples and their entries (subj, pred, obj)"""
 
-    def __init__(self, path="./corpus"):
+    def __init__(self, path="./"):
         self.entries = []
         self.path = path  # relative from main.py
 
@@ -37,15 +40,25 @@ class Fetcher:
 
     def fetch(self):
         """fetches wikipedia summaries for all passed triples and their entries (subj, pred, obj). Takes the first entry of a search on wikipedia"""
-        with open(self.path, "a", encoding="utf_8") as corpus:
+        timestamp = datetime.now().isoformat(
+            timespec="seconds").replace(":", "-").replace(".", "-")
+        with open(f"{self.path}corpus-{timestamp}", "a", encoding="utf_8") as corpus:
             for item in tqdm(self.entries):
-                pages = wikipedia.search(item)
-                if pages:
-                    try:
-                        corpus.write(wikipedia.summary(pages[0]) + "\n")
-                    except:
-                        print("error for {}, found pages: {}".format(item, pages))
-                        continue
+                #pages = wikipedia.search(item)
+                # if pages:
+                try:
+                    page = wikipedia.page(item)
+                    corpus.write(page.content.replace(
+                        "\n", "").replace("==", ""))
+                    # corpus.write(wikipedia.summary(pages[0]) + "\n")
+                except KeyboardInterrupt:
+                    raise
+                except PageError:
+                    print(f"no page found for {item}. skip.")
+                except:
+                    # print("error for {}, found pages: {}".format(item, pages))
+                    print(f"error for {item}, error:{sys.exc_info()[0]}")
+                    continue
             self.entries = []
         return self
 

@@ -26,7 +26,7 @@ class Similarity (Input):
         self._regex_expressions = []
         self._entries = []
 
-    def fetchEntities(self):
+    def use_regex(self):
         """ uses the regex expressions to create a list with all entities """
         for regex in self._regex_expressions:
             for doc in self.documents:
@@ -41,7 +41,7 @@ class Similarity (Input):
                             ".", "").replace("'s", ""))
         return self
 
-    def candidates(self, num_compare_candidates=4, num_candidates=INFINITY, DEBUG=False):
+    def generate_regex(self, compare=4, num_candidates=INFINITY, DEBUG=False):
         """ creates regex expressions of the given file """
         for current in range(len(self.documents)):
             # preprocess sentences (no lower(), cause "Stars" and "stars" should be different)
@@ -72,7 +72,7 @@ class Similarity (Input):
                         break
                     print(distance)
             # check it min n samples have some same words
-            if distances[num_compare_candidates - 1].sim == 0.0:
+            if distances[min(compare - 1, len(distances) - 1)].sim == 0.0:
                 if DEBUG:
                     print("too less samples for:", self._candidates[current])
                 skipped += 1
@@ -84,7 +84,7 @@ class Similarity (Input):
                 # make the var accessible outside the next loop
                 found_duplicate = False
                 # go through each other sentence, skip the first, cause this is actually the current sentence
-                for other in distances[1:num_compare_candidates]:
+                for other in distances[1:compare]:
                     # inititially no same word is found in any other sentence
                     found_duplicate = False
                     # on iterating through Candidates, current index is saved, on next loop it starts there, so order of words is preserved
