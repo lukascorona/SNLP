@@ -11,7 +11,7 @@ class Fetcher:
     """fetches wikipedia summaries for all passed triples and their entries (subj, pred, obj)"""
 
     def __init__(self, path="./"):
-        self.entries = []
+        self.entries = set()
         self.path = path  # relative from main.py
 
     def file(self, output_file):
@@ -32,8 +32,10 @@ class Fetcher:
 
     def add(self, entry):
         """adds a single entry or list of entries, which should be processed on fetch() call"""
-        if type(entry) is list:
+        if type(entry) in [list, tuple]:
             self.entries += entry
+        elif type(entry) is set:
+            self.entries |= entry
         else:
             self.entries.append(entry)
         return self
@@ -54,10 +56,10 @@ class Fetcher:
                 except KeyboardInterrupt:
                     raise
                 except PageError:
-                    print(f"no page found for {item}. skip.")
+                    print(f"\nno page found for {item}. skip.")
                 except:
                     # print("error for {}, found pages: {}".format(item, pages))
-                    print(f"error for {item}, error:{sys.exc_info()[0]}")
+                    print(f"\nerror for {item}, error:{sys.exc_info()[0]}")
                     continue
             self.entries = []
         return self

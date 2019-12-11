@@ -4,7 +4,7 @@ from transform.TextToTriple import TextToTriple
 from transform.Similarity import Similarity
 from transform.Facts import Facts
 from enum import Enum
-import pprint
+from pprint import pprint
 
 
 class Mode(Enum):
@@ -16,12 +16,14 @@ mode = Mode.BUILD_CORPUS
 
 # build corpus
 if mode is Mode.BUILD_CORPUS:
-    entries = Similarity().tsv(
-        "./SNLP2019_training.tsv").generate_regex(compare=8).use_regex().entries()
+    similarity = Similarity()
+    entries = similarity.tsv(
+        "./SNLP2019_training.tsv").generate_regex(compare=30).use_regex().entries()
+    pprint(similarity.expressions())
     Fetcher().add(entries).fetch()
 
 elif mode is Mode.CHECK_FACTS:
     regex = Similarity().tsv(
-        "./SNLP2019_training.tsv")[:200].generate_regex(compare=8).expressions()
+        "./SNLP2019_training.tsv")[:200].generate_regex(compare=30).expressions()
     Facts().tsv(
         "./SNLP2019_training.tsv").check(regex, "./corpus-04-12-2019")

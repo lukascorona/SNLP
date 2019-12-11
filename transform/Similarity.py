@@ -24,7 +24,7 @@ class Similarity (Input):
         self._candidates_set = []
         self._regex = set()
         self._regex_expressions = []
-        self._entries = []
+        self._entries = set()
 
     def use_regex(self):
         """ uses the regex expressions to create a list with all entities """
@@ -34,11 +34,12 @@ class Similarity (Input):
                 if matches:
                     if type(matches[0]) is tuple:
                         for entry in matches[0]:
-                            self._entries.append(entry.replace(
+                            self._entries.add(entry.replace(
                                 ".", "").replace("'s", ""))
                     else:
-                        self._entries.append(matches[0].replace(
+                        self._entries.add(matches[0].replace(
                             ".", "").replace("'s", ""))
+        print(f"# entries found:{len(self._entries)}")
         return self
 
     def generate_regex(self, compare=4, num_candidates=INFINITY, DEBUG=False):
@@ -49,7 +50,7 @@ class Similarity (Input):
                 self.documents[current].replace("'s", "").split())
             # create sets ot the words, no duplicates and faster for computation later
             self._candidates_set.append(
-                set(self.documents[current].lower().split()))
+                set(self.documents[current].replace("'s", "").split()))
 
         num_docs = len(self._candidates)
         skipped = 0
@@ -76,18 +77,19 @@ class Similarity (Input):
                 if DEBUG:
                     print("too less samples for:", self._candidates[current])
                 skipped += 1
-                break
             sublist = []
+            found_objects = 0
             last_inserted_word = None
             # go through each word of current sentence
             for curr_index, word_curr in enumerate(self._candidates[current]):
                 # make the var accessible outside the next loop
                 found_duplicate = False
                 # go through each other sentence, skip the first, cause this is actually the current sentence
-                for other in distances[1:compare]:
+                for other in distances[1:compare + 1]:
                     # inititially no same word is found in any other sentence
                     found_duplicate = False
                     # on iterating through Candidates, current index is saved, on next loop it starts there, so order of words is preserved
+                    # TODO check if thats right: other.words[other.index + 1:]
                     for i, word in enumerate(other.words[other.index:]):
                         if word_curr == word:
                             found_duplicate = True
@@ -102,22 +104,26 @@ class Similarity (Input):
                     # if we have the first word, but it is not the first in the sentence add "(.*)" at the beginning
                     if curr_index > 0 and not sublist:
                         sublist.append("(.*)")
+                        found_objects += 1
                     # if the current word comes directly after the previous one, delete the "(.*)" after the previous word
                     elif curr_index > 0 and last_inserted_word == self._candidates[current][curr_index - 1]:
                         del sublist[-1]
+                        found_objects -= 1
                     # add the word to the rexeg expression
                     sublist.append(
                         word_curr.replace(".", ""))
                     # if the word is not at the end, add a "(.*)" after it
                     if not word_curr.endswith("."):
                         sublist.append("(.*)")
+                        found_objects += 1
                     last_inserted_word = word_curr
-            if sublist:
+            if len(sublist) >= 4 and found_objects >= 2 or sublist == ["(.*)", "stars", "(.*)"]:
                 self._regex.add(tuple(sublist))
 
         for reg in self._regex:
             self._regex_expressions.append(" ".join(list(reg)))
-        print("skipped: {}".format(skipped))
+        print(
+            f"skipped: {skipped}, # regex exp found: {len(self._regex_expressions)}")
         return self
 
     def printRegex(self):
