@@ -15,8 +15,10 @@ class Facts(Input):
         # get all important sentences out of the corpus
         with open(corpus_path, "r", encoding="utf-8") as corpus:
             knowledge = []
+            used_regex = []
             for i in range(len(self.documents)):
                 knowledge.append([])
+                used_regex.append([])
             for line in tqdm(corpus):
                 for i, doc in enumerate(self.documents):
                     for regex in regex_exp:
@@ -25,11 +27,13 @@ class Facts(Input):
                             from_corpus = []
                             for entry in entries:
                                 from_corpus += self.reg(entry +
-                                                        "[^\.]*\.", line)[1]
+                                                        "[^\.]*\.", line)[1]  # from found obj subj to the end of sentence
                             knowledge[i] += from_corpus
+                            used_regex[i] = regex
                             break
         # TODO now do something with the sentences per document
         pprint.pprint(knowledge)
+        pprint.pprint(used_regex)
         return self
 
     def reg(self, pattern, text):
