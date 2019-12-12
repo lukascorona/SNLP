@@ -12,7 +12,7 @@ class Mode(Enum):
     CHECK_FACTS = 2
 
 
-mode = Mode.BUILD_CORPUS
+mode = Mode.CHECK_FACTS
 
 # build corpus
 if mode is Mode.BUILD_CORPUS:
@@ -25,6 +25,6 @@ if mode is Mode.BUILD_CORPUS:
 
 elif mode is Mode.CHECK_FACTS:
     regex = Similarity().tsv(
-        "./SNLP2019_training.tsv")[:200].generate_regex(compare=30).expressions()
+        "./SNLP2019_training.tsv").generate_regex(compare=30).expressions()
     Facts().tsv(
-        "./SNLP2019_training.tsv").check(regex, "./corpus-04-12-2019")
+        "./SNLP2019_training.tsv").check(regex, "./corpus-2019-12-11T21-19-46_train_and_test")  # corpus-2019-12-11T21-19-46_train_and_test corpus-2019-12-11T20-04-11_train
