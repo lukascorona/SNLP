@@ -18,7 +18,8 @@ mode = Mode.BUILD_CORPUS
 if mode is Mode.BUILD_CORPUS:
     similarity = Similarity()
     entries = similarity.tsv(
-        "./SNLP2019_training.tsv").generate_regex(compare=30).use_regex().entries()
+        "./SNLP2019_training.tsv").tsv(
+        "./SNLP2019_test.tsv").generate_regex(compare=30).use_regex().entries()
     pprint(similarity.expressions())
     Fetcher().add(entries).fetch()
 
