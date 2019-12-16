@@ -10,9 +10,10 @@ from pprint import pprint
 class Mode(Enum):
     BUILD_CORPUS = 1
     CHECK_FACTS = 2
+    OTHER = 3
 
 
-mode = Mode.CHECK_FACTS
+mode = Mode.OTHER
 
 # build corpus
 if mode is Mode.BUILD_CORPUS:
@@ -28,3 +29,9 @@ elif mode is Mode.CHECK_FACTS:
         "./SNLP2019_training.tsv").generate_regex(compare=30).expressions()
     Facts().tsv(
         "./SNLP2019_training.tsv").check(regex, "./corpus-2019-12-11T21-19-46_train_and_test")  # corpus-2019-12-11T21-19-46_train_and_test corpus-2019-12-11T20-04-11_train
+
+elif mode is Mode.OTHER:
+    s = Similarity().tsv(
+        "./SNLP2019_training.tsv")[:10]
+    pprint(s.ids)
+    pprint(s.documents)

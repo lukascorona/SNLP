@@ -5,8 +5,7 @@ class Input:
 
     def __init__(self):
         self.documents = []
-        self.start = None
-        self.end = None
+        self.ids = []
         self.truth = []
 
     def file(self, txtPath: str) -> 'TextToTriple':
@@ -26,10 +25,12 @@ class Input:
             reader = csv.DictReader(csvfile, dialect='excel-tab')
             if "True/False" in reader.fieldnames:
                 for row in reader:
+                    self.ids.append(row["FactID"])
                     self.documents.append(row["Fact_Statement"])
                     self.truth.append(float(row["True/False"]))
             else:
                 for row in reader:
+                    self.ids.append(row["FactID"])
                     self.documents.append(row["Fact_Statement"])
         return self
 
@@ -43,4 +44,7 @@ class Input:
     def __getitem__(self, val):
         if type(val) is slice:
             self.documents = self.documents[val]
+            self.ids = self.ids[val]
+            if self.truth:
+                self.truth = self.truth[val]
         return self
