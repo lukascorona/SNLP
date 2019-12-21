@@ -2,6 +2,7 @@ import spacy
 from input.input import Input
 from spacy import displacy
 from spacy.symbols import nsubj, VERB
+from pprint import pprint
 import re
 
 
@@ -20,36 +21,80 @@ class TextToTriple (Input):
             print(" " * depth, child.lemma_, child.dep_, child.pos_)
             self.recursivePrint(child, depth)
 
-    @DeprecationWarning
+    def getChilds(self, entry):
+        tree = {}
+        full_tree = {'left': [], 'right': [], 'entry': entry,
+                     'dep': entry.dep_, 'pos': entry.pos_}
+        for child in entry.lefts:
+            subtree = self.getChilds(child)
+            tree[f"left: {child.text}, {child.lemma_}, {child.pos_} {child.dep_}"] = subtree[0]
+            full_tree['left'].append(subtree[1])
+        for child in entry.rights:
+            subtree = self.getChilds(child)
+            tree[f"right: {child.text}, {child.lemma_}, {child.pos_} {child.dep_}"] = subtree[0]
+            full_tree['right'].append(subtree[1])
+        return (tree, full_tree)
+
+    # @DeprecationWarning
     def process(self, debug: bool = False):
         """ all documents """
         """ see https://spacy.io/api/annotation """
-        nlp = spacy.load("en_core_web_sm")
+        nlp = spacy.load("en_core_web_md")
+
+        typesetting = [
+            r"(?P<obj>.*)<<nsubj>>.*<<ROOT>>(?P<subj>.*)<<poss>>.*<<case>>(?P<verb>.*)(?:<<attr>>|<<pobj>>)",
+            r"(?P<subj>.*)<<poss>>.*<<case>>(?P<verb>.*)<<ROOT>>(?P<obj>.*)(?:<<appos>>|attr)"
+        ]
 
         for doc in self.documents:
+            if debug:
+                print(doc + "================================================")
             triple = [None, None, None]
             tokens = nlp(doc)
             # for chunk in tokens.noun_chunks:
             #     print("text: {}, root: {}, dep: {}, root head: {}".format(chunk.text, chunk.root.text, chunk.root.dep_,
             #                                                               chunk.root.head.text))
             # maybe we have to use https://spacy.io/usage/linguistic-features
-            displacy.render(tokens, style="dep")
+            # displacy.render(tokens, style="dep")
+            regex_friendly_string = ""
             for i in tokens:
+                regex_friendly_string += f"{i.lemma_}<<{i.dep_}>>"
+            for setting in typesetting:
+                matches = re.match(
+                    setting, regex_friendly_string)
+                if matches and len(matches.groupdict()) == 3:
+                    formatted = {}
+                    for key, value in matches.groupdict().items():
+                        formatted[key] = re.sub(r"<<[^<>]*>>", " ", value)
+                    print("found", formatted)
+                    break
 
-                if debug:
-                    print(i.lemma_, i.pos_, i.tag_, i.dep_, i.ent_type_)
-                    print(i.lemma_, [child for child in i.children], i.head.text, [
-                          child for child in i.head.children])
-                if i.pos in [VERB]:
-                    triple[1] = i.lemma_
-                    self.recursivePrint(i, 0)
-                # elif i.ent_type_ in ["PERSON", "ORG", "GPE", "LOC", "DATE"]:
-                #     if triple[1] == None:
-                #         triple[0] = i.lemma_
-                #     else:
-                #         triple[2] = i.lemma_
-            if None not in triple:
-                self.triples.append(triple)
+            print(regex_friendly_string)
+            # if debug:
+            #     print(
+            #         f"text: {i.text}, \tlemma: {i.lemma_}, \tdep: {i.dep_}, \ttype: {i.ent_type_}")
+
+            # if i.dep_ == "ROOT":
+            # printtree, tree = self.getChilds(i)
+            # pprint(tree)
+            # verb = []
+            # obj = []
+            # subj = []
+            # print((subj, verb, obj))
+            # verb += tree
+            # print(i.lemma_, i.pos_, i.tag_, i.dep_, i.ent_type_)
+            # print(i.lemma_, [child for child in i.children], i.head.text, [
+            #       child for child in i.head.children])
+            # if i.pos in [VERB]:
+            #     triple[1] = i.lemma_
+            #     self.recursivePrint(i, 0)
+            # elif i.ent_type_ in ["PERSON", "ORG", "GPE", "LOC", "DATE"]:
+            #     if triple[1] == None:
+            #         triple[0] = i.lemma_
+            #     else:
+            #         triple[2] = i.lemma_
+            # if None not in triple:
+            #     self.triples.append(triple)
         return self
 
     def regex(self, debug: bool = False):
