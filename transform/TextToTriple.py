@@ -42,13 +42,13 @@ class TextToTriple (Input):
         nlp = spacy.load("en_core_web_md")
 
         typesetting = [
-            r"(?P<obj>.*)<<nsubj>>.*<<ROOT>>(?P<subj>.*)<<poss>>.*<<case>>(?P<verb>.*)(?:<<attr>>|<<pobj>>)",
-            r"(?P<subj>.*)<<poss>>.*<<case>>(?P<verb>.*)<<ROOT>>(?P<obj>.*)(?:<<appos>>|attr)"
+            r"(?P<obj>.*)(?:<<nsubj>>|<<appos>>|<<nmod>>).*<<ROOT>>(?P<subj>.*)<<poss>>.*<<case>>(?P<verb>.*)(?:<<attr>>|<<pobj>>)",
+            r"(?P<subj>.*)(?:<<poss>>|<<nmod>>).*<<case>>(?P<verb>.*)<<ROOT>>(?P<obj>.*)(?:<<appos>>|attr)"
         ]
 
         for doc in self.documents:
-            if debug:
-                print(doc + "================================================")
+            # if debug:
+            #     print("================================================" + doc)
             triple = [None, None, None]
             tokens = nlp(doc)
             # for chunk in tokens.noun_chunks:
@@ -59,17 +59,22 @@ class TextToTriple (Input):
             regex_friendly_string = ""
             for i in tokens:
                 regex_friendly_string += f"{i.lemma_}<<{i.dep_}>>"
+            found = False
             for setting in typesetting:
                 matches = re.match(
                     setting, regex_friendly_string)
                 if matches and len(matches.groupdict()) == 3:
+                    found = True
                     formatted = {}
                     for key, value in matches.groupdict().items():
                         formatted[key] = re.sub(r"<<[^<>]*>>", " ", value)
-                    print("found", formatted)
+                    # print("found", formatted)
                     break
+            if not found:
+                print(doc)
+                print(regex_friendly_string)
 
-            print(regex_friendly_string)
+            # print(regex_friendly_string)
             # if debug:
             #     print(
             #         f"text: {i.text}, \tlemma: {i.lemma_}, \tdep: {i.dep_}, \ttype: {i.ent_type_}")
