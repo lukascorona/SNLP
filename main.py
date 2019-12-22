@@ -15,15 +15,10 @@ class Mode(Enum):
     PREPROCESSING = 5
 
 
-mode = Mode.BUILD_CORPUS
+mode = Mode.CHECK_FACTS
 
 # build corpus
 if mode is Mode.BUILD_CORPUS:
-    # similarity = Similarity()
-    # entries = similarity.tsv(
-    #     "./SNLP2019_training.tsv").tsv(
-    #     "./SNLP2019_test.tsv").generate_regex(compare=30).use_regex().entries()
-    # pprint(similarity.expressions())
     entries = TextToTriple().tsv(
         "./SNLP2019_training.tsv").genTriplets().getEntries()
     print(f"found {len(entries)} entries in train set.")
@@ -32,11 +27,19 @@ if mode is Mode.BUILD_CORPUS:
     print(f"found {len(entries)} entries in train and test set.")
     Fetcher().add(entries).fetch()
 
+# elif mode is Mode.CHECK_FACTS:
+#     regex = Similarity().tsv(
+#         "./SNLP2019_training.tsv").generate_regex(compare=30).expressions()
+#     Facts().tsv(
+#         "./SNLP2019_training.tsv").check(regex, "./corpus-2019-12-11T21-19-46_train_and_test")  # corpus-2019-12-11T21-19-46_train_and_test corpus-2019-12-11T20-04-11_train
+
 elif mode is Mode.CHECK_FACTS:
-    regex = Similarity().tsv(
-        "./SNLP2019_training.tsv").generate_regex(compare=30).expressions()
-    Facts().tsv(
-        "./SNLP2019_training.tsv").check(regex, "./corpus-2019-12-11T21-19-46_train_and_test")  # corpus-2019-12-11T21-19-46_train_and_test corpus-2019-12-11T20-04-11_train
+    # triplets = TextToTriple().tsv(
+    #     "./SNLP2019_training.tsv").genTriplets(debug=True).getTriplets()
+    corpus = TextToTriple().file(
+        "./DEP_corpus-2019-12-22T14-42-29", per_article=True, max_lines=10).documents
+    print(len(corpus))
+    print("\n\n".join(corpus))
 
 elif mode is Mode.TRIPLETS_TSV:
     triplets = TextToTriple().tsv(

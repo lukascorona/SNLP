@@ -8,14 +8,18 @@ class Input:
         self.ids = []
         self.truth = []
 
-    def file(self, txtPath: str, per_article=False) -> 'TextToTriple':
+    def file(self, txtPath: str, per_article=False, max_lines=None) -> 'TextToTriple':
         """ Read textfile and adds them to the queue """
         with open(txtPath, "r", encoding="utf-8") as fobj:
+            i = 0
             for line in fobj:
+                i += 1
                 if not per_article:
                     self.documents += line.split(".")
                 else:
                     self.documents.append(line)
+                if max_lines is not None and i >= max_lines:
+                    break
         return self
 
     def text(self, text: str) -> 'TextToTriple':
