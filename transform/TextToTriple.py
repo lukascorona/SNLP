@@ -42,33 +42,56 @@ class TextToTriple (Input):
         nlp = spacy.load("en_core_web_md")
 
         typesetting = [
-            r"(?P<obj>.*)(?:<<nsubj>>|<<appos>>|<<nmod>>).*<<ROOT>>(?P<subj>.*)<<poss>>.*<<case>>(?P<verb>.*)(?:<<attr>>|<<pobj>>)",
-            r"(?P<subj>.*)(?:<<poss>>|<<nmod>>).*<<case>>(?P<verb>.*)<<ROOT>>(?P<obj>.*)(?:<<appos>>|attr)"
+            r"(?P<obj>.*)(?:<<nsubj>>|<<appos>>|<<nmod>>).*<<ROOT>>(?P<subj>.*)(?:<<poss>>|<<conj>>).*<<case>>(?P<verb>.*)(?:<<attr>>|<<pobj>>|<<appos>>|<<dobj>>|<<ROOT>>)",
+            r"(?P<subj>.*)(?:<<poss>>|<<nmod>>|<<pobj>>).*<<case>>(?P<verb>.*)(?:<<ROOT>>|<<auxpass>>|<<aux>>|<<ccomp>>)(?P<obj>.*)(?:<<appos>>|<<attr>>|<<nsubj>>|<<acomp>>)",
+            r"(?P<subj>.*)(?:<<nsubj>>|<<advmod>>)(?P<verb>.*)<<ROOT>>(?P<obj>((?!<<case>>).)*)(?:<<appos>>|attr|dobj)",
+            r"(?P<obj>.*)(?P<verb><<compound>>star<<nsubj>>)(?P<subj>.*)",
+            r"(?P<obj>.*)(?P<verb><<compound>>star<<ROOT>>)(?P<subj>.*)",
+            r"(?P<obj>.*)(?P<verb><<amod>>star<<pobj>>)(?P<subj>.*)",
+            r"(?P<obj>.*)(?P<verb><<amod>>star<<compound>>)(?P<subj>.*)",
+            r"(?P<obj>.*)(?P<verb><<dobj>>star<<dobj>>)(?P<subj>.*)",
+            r"(?P<obj>.*)(?P<verb><<dobj>>star<<compound>>)(?P<subj>.*)",
+            r"(?P<obj>.*)(?P<verb><<nsubj>>star<<compound>>)(?P<subj>.*)",
+            r"(?P<obj>.*)(?P<verb><<nsubj>>star<<ROOT>>)(?P<subj>.*)",
+            r"(?P<obj>.*)(?P<verb><<nummod>>star<<compound>>)(?P<subj>.*)",
+            r"(?P<obj>.*)(?P<verb><<nummod>>star<<ROOT>>)(?P<subj>.*)",
+            r"(?P<obj>.*)(?P<verb><<compound>>star<<compound>>)(?P<subj>.*)<<ROOT>>"
         ]
+        sentences = []
+        for i, setting in enumerate(typesetting):
+            sentences.append([])
 
         for doc in self.documents:
             # if debug:
             #     print("================================================" + doc)
             triple = [None, None, None]
+            doc = re.sub(r"([()]|(-PRON-))", "", doc)
             tokens = nlp(doc)
             # for chunk in tokens.noun_chunks:
             #     print("text: {}, root: {}, dep: {}, root head: {}".format(chunk.text, chunk.root.text, chunk.root.dep_,
             #                                                               chunk.root.head.text))
             # maybe we have to use https://spacy.io/usage/linguistic-features
             # displacy.render(tokens, style="dep")
+
             regex_friendly_string = ""
             for i in tokens:
                 regex_friendly_string += f"{i.lemma_}<<{i.dep_}>>"
             found = False
-            for setting in typesetting:
+            for i, setting in enumerate(typesetting):
                 matches = re.match(
                     setting, regex_friendly_string)
                 if matches and len(matches.groupdict()) == 3:
+                    if len(matches.groupdict()) > 3:
+                        print(f"greater than 3: {regex_friendly_string}")
+                    if found:
+                        print(f"second regex: {i}: {regex_friendly_string}")
                     found = True
                     formatted = {}
                     for key, value in matches.groupdict().items():
                         formatted[key] = re.sub(r"<<[^<>]*>>", " ", value)
                     # print("found", formatted)
+                    sentences[i].append(
+                        f"{formatted} = {regex_friendly_string}")
                     break
             if not found:
                 print(doc)
@@ -100,6 +123,7 @@ class TextToTriple (Input):
             #         triple[2] = i.lemma_
             # if None not in triple:
             #     self.triples.append(triple)
+        # pprint(sentences)
         return self
 
     def regex(self, debug: bool = False):
