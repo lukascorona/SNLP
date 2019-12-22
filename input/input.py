@@ -10,7 +10,7 @@ class Input:
 
     def file(self, txtPath: str) -> 'TextToTriple':
         """ Read textfile and adds them to the queue """
-        with open(txtPath, "r") as fobj:
+        with open(txtPath, "r", encoding="utf-8") as fobj:
             for line in fobj:
                 self.documents += line.split(".")
         return self

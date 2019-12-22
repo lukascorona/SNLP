@@ -10,18 +10,26 @@ from pprint import pprint
 class Mode(Enum):
     BUILD_CORPUS = 1
     CHECK_FACTS = 2
-    OTHER = 3
+    TRIPLETS_TSV = 3
+    TRIPLETS_CORPUS = 4
+    PREPROCESSING = 5
 
 
-mode = Mode.OTHER
+mode = Mode.BUILD_CORPUS
 
 # build corpus
 if mode is Mode.BUILD_CORPUS:
-    similarity = Similarity()
-    entries = similarity.tsv(
-        "./SNLP2019_training.tsv").tsv(
-        "./SNLP2019_test.tsv").generate_regex(compare=30).use_regex().entries()
-    pprint(similarity.expressions())
+    # similarity = Similarity()
+    # entries = similarity.tsv(
+    #     "./SNLP2019_training.tsv").tsv(
+    #     "./SNLP2019_test.tsv").generate_regex(compare=30).use_regex().entries()
+    # pprint(similarity.expressions())
+    entries = TextToTriple().tsv(
+        "./SNLP2019_training.tsv").genTriplets().getEntries()
+    print(f"found {len(entries)} entries in train set.")
+    entries |= TextToTriple().tsv(
+        "./SNLP2019_test.tsv").genTriplets().getEntries()
+    print(f"found {len(entries)} entries in train and test set.")
     Fetcher().add(entries).fetch()
 
 elif mode is Mode.CHECK_FACTS:
@@ -30,7 +38,16 @@ elif mode is Mode.CHECK_FACTS:
     Facts().tsv(
         "./SNLP2019_training.tsv").check(regex, "./corpus-2019-12-11T21-19-46_train_and_test")  # corpus-2019-12-11T21-19-46_train_and_test corpus-2019-12-11T20-04-11_train
 
-elif mode is Mode.OTHER:
+elif mode is Mode.TRIPLETS_TSV:
     triplets = TextToTriple().tsv(
         "./SNLP2019_test.tsv").genTriplets(debug=True).getTriplets()
     pprint(triplets)
+
+elif mode is Mode.TRIPLETS_CORPUS:
+    triplets = TextToTriple().file(
+        ".\corpus-2019-12-11T20-04-11_train")[:100].genTriplets(debug=True).getTriplets()
+    pprint(triplets)
+
+elif mode is Mode.PREPROCESSING:
+    triplets = TextToTriple().file(
+        ".\corpus-2019-12-11T20-04-11_train").savePreprocessed(".\PREPR_corpus-2019-12-11T20-04-11_train")

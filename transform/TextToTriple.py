@@ -1,6 +1,7 @@
 import spacy
 from input.input import Input
 from spacy.symbols import nsubj, VERB
+from tqdm import tqdm
 from pprint import pprint
 import re
 
@@ -8,14 +9,16 @@ import re
 class TextToTriple (Input):
     _triplets = []
     statistics = {}
+    _entries = set()
 
     def __init__(self):
         Input.__init__(self)
 
-    def genTriplets(self, debug: bool = False):
+    def genTriplets(self, debug: bool = False, preprocessed=False):
         """ all documents """
         """ see https://spacy.io/api/annotation """
-        nlp = spacy.load("en_core_web_md")
+        if not preprocessed:
+            nlp = spacy.load("en_core_web_md")
 
         typesetting = [
             r"(?P<obj>.*)(?:<<nsubj>>|<<appos>>|<<nmod>>).*<<ROOT>>(?P<subj>.*)(?:<<poss>>|<<conj>>).*<<case>>(?P<verb>.*)(?:<<attr>>|<<pobj>>|<<appos>>|<<dobj>>|<<ROOT>>)",
@@ -35,11 +38,16 @@ class TextToTriple (Input):
         ]
 
         for doc in self.documents:
-            doc = re.sub(r"([()]|(-PRON-))", "", doc)
-            tokens = nlp(doc)
-            regex_friendly_string = ""
-            for i in tokens:
-                regex_friendly_string += f"{i.lemma_}<<{i.dep_}>>"
+            if not preprocessed:
+                doc = re.sub(r"[()]", "", doc)
+                tokens = nlp(doc)
+                regex_friendly_string = ""
+                for i in tokens:
+                    regex_friendly_string += f"{i.lemma_}<<{i.dep_}>>"
+                regex_friendly_string = regex_friendly_string.replace(
+                    "-PRON-", "")
+            else:
+                regex_friendly_string = doc
             found = False
             for i, setting in enumerate(typesetting):
                 matches = re.match(
@@ -55,6 +63,8 @@ class TextToTriple (Input):
                         formatted[key] = re.sub(
                             r"<<[^<>]*>>", " ", value).lower()
                     self._triplets.append(formatted)
+                    self._entries.add(formatted['subj'])
+                    self._entries.add(formatted['obj'])
                     break
             if not found:
                 print(doc)
@@ -63,6 +73,23 @@ class TextToTriple (Input):
 
     def getTriplets(self):
         return self._triplets
+
+    def getEntries(self):
+        return self._entries
+
+    @DeprecationWarning
+    def savePreprocessed(self, filename):
+        nlp = spacy.load("en_core_web_md")
+        with open(filename, "w", encoding="utf-8") as fobj:
+            for doc in tqdm(self.documents):
+                doc = re.sub(r"[()]", "", doc)
+                tokens = nlp(doc)
+                regex_friendly_string = ""
+                for i in tokens:
+                    regex_friendly_string += f"{i.lemma_}<<{i.dep_}>>"
+                regex_friendly_string = regex_friendly_string.replace(
+                    "-PRON-", "")
+                fobj.write(regex_friendly_string + "\n")
 
     def print(self):
         """prints triples"""
