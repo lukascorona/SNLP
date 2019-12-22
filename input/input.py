@@ -8,11 +8,14 @@ class Input:
         self.ids = []
         self.truth = []
 
-    def file(self, txtPath: str) -> 'TextToTriple':
+    def file(self, txtPath: str, per_article=False) -> 'TextToTriple':
         """ Read textfile and adds them to the queue """
         with open(txtPath, "r", encoding="utf-8") as fobj:
             for line in fobj:
-                self.documents += line.split(".")
+                if not per_article:
+                    self.documents += line.split(".")
+                else:
+                    self.documents.append(line)
         return self
 
     def text(self, text: str) -> 'TextToTriple':
