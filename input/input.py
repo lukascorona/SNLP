@@ -55,3 +55,21 @@ class Input:
             if self.truth:
                 self.truth = self.truth[val]
         return self
+
+    @staticmethod
+    def tsvToLists(tsvPath):
+        """reads tsv file and returns lists of ids, facts and truth values if available"""
+        ids, facts, truthValues = [], [], []
+        with open(tsvPath, encoding="utf-8") as csvfile:
+            reader = csv.DictReader(csvfile, dialect='excel-tab')
+            # check if file contains truth values
+            if "True/False" in reader.fieldnames:
+                for row in reader:
+                    ids.append(row["FactID"])
+                    facts.append(row["Fact_Statement"])
+                    truthValues.append(float(row["True/False"]))
+            else:
+                for row in reader:
+                    ids.append(row["FactID"])
+                    facts.append(row["Fact_Statement"])
+        return ids, facts, truthValues

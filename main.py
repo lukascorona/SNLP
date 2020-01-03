@@ -1,7 +1,9 @@
 from fetch.fetch import Fetcher
 from input.input import Input
+from output.output import Output
 from transform.TextToTriple import TextToTriple
 from transform.Similarity import Similarity
+from transform.AdvancedChecker import AdvancedChecker
 from transform.Facts import Facts
 from enum import Enum
 from pprint import pprint
@@ -13,9 +15,10 @@ class Mode(Enum):
     TRIPLETS_TSV = 3
     TRIPLETS_CORPUS = 4
     PREPROCESSING = 5
+    CHECK_FACTS_ADVANCED = 6
 
 
-mode = Mode.CHECK_FACTS
+mode = Mode.CHECK_FACTS_ADVANCED
 
 # build corpus
 if mode is Mode.BUILD_CORPUS:
@@ -54,3 +57,12 @@ elif mode is Mode.TRIPLETS_CORPUS:
 elif mode is Mode.PREPROCESSING:
     triplets = TextToTriple().file(
         ".\corpus-2019-12-11T20-04-11_train").savePreprocessed(".\PREPR_corpus-2019-12-11T20-04-11_train")
+
+elif mode is Mode.CHECK_FACTS_ADVANCED:
+    tsvPath = "./SNLP2019_test.tsv"#"./SNLP2019_training.tsv"
+    corpusPath = "./corpus-2019-12-22T14-42-29"
+    similarity = Similarity()
+    similarity.tsv(tsvPath).generate_regex(compare=30).use_regex() 
+    checker = AdvancedChecker(similarity.expressions())
+    ids, values = checker.check(tsvPath, corpusPath)
+    Output.generateFile(ids, values)
