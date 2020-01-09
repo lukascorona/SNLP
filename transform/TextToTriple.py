@@ -67,6 +67,7 @@ class TextToTriple (Input):
                     self._entries.add(formatted['obj'])
                     break
             if not found:
+                self._triplets.append({'subj': 'UNKNOWN', 'verb': 'UNKNOWN', 'obj': 'UNKNOWN'})
                 print(doc)
                 print(regex_friendly_string)
         return self

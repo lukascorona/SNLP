@@ -12,6 +12,6 @@ class Output:
     @staticmethod
     def generateFile(sentence_ids, values):
         time = datetime.now().strftime("%d-%m-%Y_%I-%M-%S_%p")
-        with open("{}/{}.tll".format(Output.path, time), "w") as file:
+        with open("{}/{}.ttl".format(Output.path, time), "w") as file:
             for sentence, value in zip(sentence_ids, values):
                 file.write(Output.generateTriple(sentence, value))

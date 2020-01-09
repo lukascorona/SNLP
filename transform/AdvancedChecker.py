@@ -1,16 +1,24 @@
 from input.input import Input
+import nltk.data
 import re
 from random import *
 import time
 import numpy as np
 
 class AdvancedChecker(Input):
-    
-    def __init__(self, regex_list):
-        Input.__init__(self)
-        self.predition = []
-        self.regex_list = regex_list
         
+    def __init__(self, *args):
+        Input.__init__(self)
+        self.tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
+        if len(args) == 1 and isinstance(args[0][0], str):
+            print("AdvancedChecker for Regex:\n")
+            self.regex_list = args[0]
+            self.type = "REGEX"
+        else:
+            print("AdvancedChecker for Triples:\n")
+            self.triples = args[0]
+            self.type="TRIPLES"
+    
     def check(self, tsvPath, corpusPath):
         start_time = time.time()
         # get data from the tsv
@@ -56,8 +64,47 @@ class AdvancedChecker(Input):
                                 # return value if we are certain
                                 return value
         # If no value was found that we are sure of, we return 0
-        return 0                     
+        return 0        
+                         
      
+    def checkWithTriples(self, tsvPath, corpusPath):
+        start_time = time.time()
+        # get data from the tsv
+        ids, facts, truthValues = self.tsvToLists(tsvPath)
+        values = []
+        print(len(facts))
+        print(len(self.triples))
+
+        for i in range(0, len(facts)):
+            print("Checking:   " + facts[i])
+            values.append(self.CheckFactWithTriples(self.triples[i], corpusPath))
+            
+        if len(truthValues) > 0:
+            correct = 0
+            for i in range(min(len(truthValues), len(values))):
+                if truthValues[i] == values[i]:
+                    correct += 1
+            print("Correctly Found: {} out of {} ({}%)".format(correct, len(values), (correct / len(values))*100))
+        print("Elapsed time: {} seconds".format(time.time() - start_time))    
+        return ids, values
+    
+    def CheckFactWithTriples(self, triple, corpusPath):
+        subj = triple.get('subj')
+        verb = triple.get('verb')
+        obj = triple.get('obj')
+        
+        if subj == "UNKNOWN":
+            return 0
+        
+        with open(corpusPath, "r", encoding="utf-8") as corpus:
+            for article in corpus:
+                if subj in article or obj in article:
+                    value, certain = AdvancedChecker.checkFactOnArticle(subj, verb, obj, article) #self.checkFactOnSentences(subj, verb, obj, article)
+                    if certain:
+                        # return value if we are certain
+                        return value
+        return 0 
+    
     @staticmethod
     def checkFactOnArticle(obj1, rest, obj2, article):
         """Check whether the fact can be implied from the article or not"""
@@ -71,5 +118,15 @@ class AdvancedChecker(Input):
         elif obj1 in article or obj2 in article:
             return 0, False
         else:
-            print("Something went wrong")
-            return round(random()), False
+            return 0, False
+            #print("Something went wrong")
+            #return round(random()), False
+        
+    def checkFactOnSentences(self, obj1, rest, obj2, article):
+        for sentence in self.tokenizer.tokenize(article):
+            #print('Sentence: ' + sentence)
+            value, certain = AdvancedChecker.checkFactOnArticle(obj1, rest, obj2, sentence)
+            if certain:
+                return value, certain
+        return 0, False
+            
