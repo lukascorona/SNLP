@@ -1,6 +1,8 @@
 import os
 from datetime import datetime
 
+# http://swc2017.aksw.org/gerbil/config
+
 class Output:
 
     path = "./output"
