@@ -48,6 +48,7 @@ class Fetcher:
         timestamp = datetime.now().isoformat(
             timespec="seconds").replace(":", "-").replace(".", "-")
         nlp = spacy.load("en_core_web_md")
+        print("fetch wikipedia pages...")
         if ram:
             corpus_in_ram = ""
             for item in tqdm(self.entries):
