@@ -1,3 +1,4 @@
+print("make imports...")
 from argparse import ArgumentParser
 from fetch.fetch import Fetcher
 from input.input import Input
@@ -9,6 +10,8 @@ from transform.Facts import Facts
 from enum import Enum
 from pprint import pprint
 import sys
+import os
+print("ready. start...")
 
 class Mode(Enum):
     BUILD_CORPUS = 1
@@ -21,33 +24,42 @@ class Mode(Enum):
 
 
 mode = Mode.CHECK_FACTS_ADVANCED
-fact = None
 
 parser = ArgumentParser(description='Fact checker')
 parser.add_argument("-f", "--fact", type=str, metavar='"..."', help="check a single fact") #nargs='*' for -f "fact 1" "fact 2"
-parser.add_argument("--fact_file", type=str, metavar='"..."', help="provide a relative path to a fact file (.tsv), ignored if \"--file\" is set")
+parser.add_argument("--fact_file", type=str, metavar='"..."', help="provide a relative path to a fact file (.tsv), ignored if \"--fact\" is set")
+parser.add_argument("--output", type=str, metavar='"..."', help="provide a relative path to a output file (.ttl), can be used with \"--fact\" or \"--fact_file\". If not set, result is only printed on console")
 parser.add_argument("-c", "--new_corpus", action='store_true', help="if set, it fetches wiki pages only for the given fact or fact file, else it uses the prefetched corpus")
 args = parser.parse_args()
 
-if args.fact != None:
+if args.fact != None or args.fact_file != None:
     mode = mode.FULL_PIPELINE
-    fact = args.fact
 
 if mode is mode.FULL_PIPELINE:
-    pass
-    # corpus = None
-    # corpusPath = "./corpus-2019-12-22T14-42-29"
-    # ttt = TextToTriple().text(fact).genTriplets()
-    # triples = ttt.getTriplets()
-    # if args.use_corpus == True:
-    #     entries = ttt.getEntries()
-    #     corpus = Fetcher().add(entries).fetch()
-    #     corpusPath = None
-
-    # checker = AdvancedChecker(triplets)
-    # ids, values = checker.checkWithTriples(tsvPath, corpusPath, corpus)
-    # Output.generateFile(ids, values)
-    
+    corpus = None
+    corpusPath = "./corpus-2019-12-22T14-42-29"
+    if args.fact:
+        ttt = TextToTriple().text(args.fact).genTriplets()
+    else: 
+        ttt = TextToTriple().tsv(args.fact_file).genTriplets()
+    triples = ttt.getTriplets()
+    if args.new_corpus == True:
+        entries = ttt.getEntries()
+        corpus = Fetcher().add(entries).fetch(ram=True)
+        corpusPath = None
+    checker = AdvancedChecker(triples)
+    ids, values = checker.checkWithTriples(args.fact_file, corpusPath, corpus)
+    if args.fact == None and args.output != None:
+        (path, filename) = os.path.split(args.output)
+        Output.path = path
+        Output.generateFile(ids, values, filename)
+        print(f"done. Output is saved to {args.output}")  
+    else:
+        for i, value in enumerate(values):
+            if value:
+                print(f"done. Fact \"{args.fact or ids[i]}\" is true")  
+            else:
+                print(f"done. Fact \"{args.fact or ids[i]}\" is false")  
 
 # build corpus
 if mode is Mode.BUILD_CORPUS:

@@ -67,15 +67,21 @@ class AdvancedChecker(Input):
         return 0        
                          
      
-    def checkWithTriples(self, tsvPath, corpusPath):
+    def checkWithTriples(self, tsvPath = None, corpusPath = None, corpus = None):
         start_time = time.time()
         # get data from the tsv
-        ids, facts, truthValues = self.tsvToLists(tsvPath)
+        truthValues = []
+        if tsvPath != None:
+            ids, facts, truthValues = self.tsvToLists(tsvPath)
+        else:
+            facts = [""]
+            ids = [0]
         values = []
+
 
         for i in range(0, len(facts)):
             print("Checking:   " + facts[i])
-            values.append(self.CheckFactWithTriples(self.triples[i], corpusPath))
+            values.append(self.CheckFactWithTriples(self.triples[i], corpusPath, corpus))
             
         if len(truthValues) > 0:
             correct = 0
@@ -86,22 +92,26 @@ class AdvancedChecker(Input):
         print("Elapsed time: {} seconds".format(time.time() - start_time))    
         return ids, values
     
-    def CheckFactWithTriples(self, triple, corpusPath):
+    def CheckFactWithTriples(self, triple, corpusPath, corpus = None):
         subj = triple.get('subj')
         verb = triple.get('verb')
         obj = triple.get('obj')
         
         if subj == "UNKNOWN":
             return 0
-        
-        with open(corpusPath, "r", encoding="utf-8") as corpus:
-            for article in corpus:
-                article = article.lower()
-                if subj in article or obj in article:
-                    value, certain = AdvancedChecker.checkFactOnArticle(subj, verb, obj, article) #self.checkFactOnSentences(subj, verb, obj, article)
-                    if certain:
-                        # return value if we are certain
-                        return value
+        if corpus == None:
+            corpus = open(corpusPath, "r", encoding="utf-8")
+        else:
+            corpus = corpus.split("\n")
+        for article in corpus:
+            article = article.lower()
+            if subj in article or obj in article:
+                value, certain = AdvancedChecker.checkFactOnArticle(subj, verb, obj, article) #self.checkFactOnSentences(subj, verb, obj, article)
+                if certain:
+                    # return value if we are certain
+                    return value
+        if corpus == None:
+            corpus.close()
         return 0 
     
     @staticmethod

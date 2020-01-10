@@ -42,11 +42,19 @@ class Fetcher:
             self.entries.append(entry)
         return self
 
-    def fetch(self):
+    def fetch(self, ram=False):
+        
         """fetches wikipedia summaries for all passed triples and their entries (subj, pred, obj). Takes the first entry of a search on wikipedia"""
         timestamp = datetime.now().isoformat(
             timespec="seconds").replace(":", "-").replace(".", "-")
         nlp = spacy.load("en_core_web_md")
+        if ram:
+            corpus_in_ram = ""
+            for item in tqdm(self.entries):
+                page = wikipedia.page(item)
+                doc = re.sub(r"[()\n=]", "", page.content)
+                corpus_in_ram += doc + "\n"
+            return corpus_in_ram
         with open(f"{self.path}corpus-{timestamp}", "a", encoding="utf_8") as corpus:
             with open(f"{self.path}DEP_corpus-{timestamp}", "a", encoding="utf_8") as corpus_dep:
                 with open(f"{self.path}POS_corpus-{timestamp}", "a", encoding="utf_8") as corpus_pos:
