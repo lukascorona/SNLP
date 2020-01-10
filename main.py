@@ -34,6 +34,7 @@ if args.fact != None:
     fact = args.fact
 
 if mode is mode.FULL_PIPELINE:
+    pass
     # corpus = None
     # corpusPath = "./corpus-2019-12-22T14-42-29"
     # ttt = TextToTriple().text(fact).genTriplets()
