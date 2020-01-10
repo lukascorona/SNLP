@@ -72,8 +72,6 @@ class AdvancedChecker(Input):
         # get data from the tsv
         ids, facts, truthValues = self.tsvToLists(tsvPath)
         values = []
-        print(len(facts))
-        print(len(self.triples))
 
         for i in range(0, len(facts)):
             print("Checking:   " + facts[i])
@@ -98,6 +96,7 @@ class AdvancedChecker(Input):
         
         with open(corpusPath, "r", encoding="utf-8") as corpus:
             for article in corpus:
+                article = article.lower()
                 if subj in article or obj in article:
                     value, certain = AdvancedChecker.checkFactOnArticle(subj, verb, obj, article) #self.checkFactOnSentences(subj, verb, obj, article)
                     if certain:

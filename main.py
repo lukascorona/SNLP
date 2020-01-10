@@ -18,7 +18,7 @@ class Mode(Enum):
     CHECK_FACTS_ADVANCED = 6
 
 
-mode = Mode.CHECK_FACTS
+mode = Mode.CHECK_FACTS_ADVANCED
 
 # build corpus
 if mode is Mode.BUILD_CORPUS:
@@ -68,7 +68,7 @@ elif mode is Mode.CHECK_FACTS_ADVANCED:
     Output.generateFile(ids, values)
     
 elif mode is Mode.CHECK_FACTS:
-    tsvPath = "./SNLP2019_training.tsv"#"./SNLP2019_training.tsv"
+    tsvPath = "./SNLP2019_test.tsv"#"./SNLP2019_training.tsv"
     corpusPath = "./corpus-2019-12-22T14-42-29"
     
     triplets = TextToTriple().tsv(tsvPath).genTriplets().getTriplets()
