@@ -1,3 +1,4 @@
+from argparse import ArgumentParser
 from fetch.fetch import Fetcher
 from input.input import Input
 from output.output import Output
@@ -7,7 +8,7 @@ from transform.AdvancedChecker import AdvancedChecker
 from transform.Facts import Facts
 from enum import Enum
 from pprint import pprint
-
+import sys
 
 class Mode(Enum):
     BUILD_CORPUS = 1
@@ -16,9 +17,36 @@ class Mode(Enum):
     TRIPLETS_CORPUS = 4
     PREPROCESSING = 5
     CHECK_FACTS_ADVANCED = 6
+    FULL_PIPELINE = 7
 
 
 mode = Mode.CHECK_FACTS_ADVANCED
+fact = None
+
+parser = ArgumentParser(description='Fact checker')
+parser.add_argument("-f", "--fact", type=str, metavar='"..."', help="check a single fact") #nargs='*' for -f "fact 1" "fact 2"
+parser.add_argument("--fact_file", type=str, metavar='"..."', help="provide a relative path to a fact file (.tsv), ignored if \"--file\" is set")
+parser.add_argument("-c", "--new_corpus", action='store_true', help="if set, it fetches wiki pages only for the given fact or fact file, else it uses the prefetched corpus")
+args = parser.parse_args()
+
+if args.fact != None:
+    mode = mode.FULL_PIPELINE
+    fact = args.fact
+
+if mode is mode.FULL_PIPELINE:
+    # corpus = None
+    # corpusPath = "./corpus-2019-12-22T14-42-29"
+    # ttt = TextToTriple().text(fact).genTriplets()
+    # triples = ttt.getTriplets()
+    # if args.use_corpus == True:
+    #     entries = ttt.getEntries()
+    #     corpus = Fetcher().add(entries).fetch()
+    #     corpusPath = None
+
+    # checker = AdvancedChecker(triplets)
+    # ids, values = checker.checkWithTriples(tsvPath, corpusPath, corpus)
+    # Output.generateFile(ids, values)
+    
 
 # build corpus
 if mode is Mode.BUILD_CORPUS:
