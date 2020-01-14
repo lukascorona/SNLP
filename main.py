@@ -1,17 +1,17 @@
-import os
-import sys
-from pprint import pprint
-from enum import Enum
-from transform.Facts import Facts
-from transform.AdvancedChecker import AdvancedChecker
-from transform.Similarity import Similarity
-from transform.TextToTriple import TextToTriple
-from output.output import Output
-from input.input import Input
-from fetch.fetch import Fetcher
 from argparse import ArgumentParser
-print("make imports...")
-print("ready. start...")
+from fetch.fetch import Fetcher
+from input.input import Input
+from output.output import Output
+from transform.TextToTriple import TextToTriple
+from transform.Similarity import Similarity
+from transform.AdvancedChecker import AdvancedChecker
+from transform.Facts import Facts
+from enum import Enum
+from pprint import pprint
+import sys
+import os
+
+# http://swc2017.aksw.org/gerbil/config
 
 
 class Mode(Enum):

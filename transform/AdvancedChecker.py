@@ -63,7 +63,6 @@ class AdvancedChecker(Input):
                 # Delete the matches found from the regex and delete unnecessary spaces
                 rest = " ".join(fact.replace(
                     obj1, "").replace(obj2, "").split())
-                print("regex results: ", obj1, obj2)
                 with open(corpusPath, "r", encoding="utf-8") as corpus:
                     for article in corpus:
                         if obj1 in article or obj2 in article:
@@ -85,9 +84,9 @@ class AdvancedChecker(Input):
             facts = [""]
             ids = [0]
         values = []
-
         for i in range(0, len(facts)):
-            print("Checking:   " + facts[i], self.triples[i])
+            print(
+                f"Checking: {i+1}/{len(facts)}\t{facts[i]}\t{self.triples[i]}")
             values.append(self.CheckFactWithTriples(
                 self.triples[i], corpusPath, corpus))
 
