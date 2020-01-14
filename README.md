@@ -2,7 +2,7 @@
 
 Mini project for snlp
 
-# install:
+# Install:
 
 Make sure Anaconda python 3 is installed. Then run following commands:
 
@@ -20,18 +20,18 @@ $ python -m spacy download en_core_web_sm
 $ python -m spacy download en_core_web_md
 ```
 
-# usage:
+# Recreate output file for GERBIL
 
-check a single fact with the prefetched corpus:
+```
+$ python main.py --fact_file "./SNLP2019_test.tsv" --output "./testout.ttl" --spacy
+```
+
+# Command line usage:
+
+check a single fact:
 
 ```
 $ python main.py -f "<some fact>"
-```
-
-...or create a temporary corpus, existing only of wikipedia pages of the object and subject in the given fact:
-
-```
-$ python main.py -f "<some fact>" --new_corpus
 ```
 
 check a .tsv file and save result in an output file
@@ -46,9 +46,16 @@ $ python main.py --fact_file "./<filename>.tsv" --output "./<filename>.ttl"
 $ python main.py --fact_file "./<filename>.tsv"
 ```
 
-also in this case a new temporary corpus can be created:
+### Options
+
+in all cases a new temporary corpus can be created, on default the prefetched corpus is used:
 
 ```
-$ python main.py --fact_file "./<filename>.tsv" --new_corpus
-$ python main.py --fact_file "./<filename>.tsv" --output "./<filename>.ttl" --new_corpus
+$ python main.py ... --new_corpus
+```
+
+and the triple generation can be switched to the spacy approach:
+
+```
+$ python main.py ... --spacy
 ```
