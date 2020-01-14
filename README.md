@@ -23,7 +23,7 @@ $ python -m spacy download en_core_web_md
 # Recreate output file for GERBIL
 
 ```
-$ python main.py --fact_file "./SNLP2019_test.tsv" --output "./testout.ttl" --spacy
+$ python main.py --fact_file "./SNLP2019_test.tsv" --output "./result_output.ttl" --spacy
 ```
 
 # Command line usage:
