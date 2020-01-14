@@ -12,6 +12,7 @@ import sys
 import os
 
 # http://swc2017.aksw.org/gerbil/config
+# python main.py --fact_file "./SNLP2019_test.tsv" --output "./testout.ttl" --spacy
 
 
 class Mode(Enum):
