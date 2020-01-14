@@ -43,7 +43,6 @@ class Fetcher:
         return self
 
     def fetch(self, ram=False):
-        
         """fetches wikipedia summaries for all passed triples and their entries (subj, pred, obj). Takes the first entry of a search on wikipedia"""
         timestamp = datetime.now().isoformat(
             timespec="seconds").replace(":", "-").replace(".", "-")
@@ -59,35 +58,42 @@ class Fetcher:
         with open(f"{self.path}corpus-{timestamp}", "a", encoding="utf_8") as corpus:
             with open(f"{self.path}DEP_corpus-{timestamp}", "a", encoding="utf_8") as corpus_dep:
                 with open(f"{self.path}POS_corpus-{timestamp}", "a", encoding="utf_8") as corpus_pos:
-                    for item in tqdm(self.entries):
-                        #pages = wikipedia.search(item)
-                        # if pages:
-                        try:
-                            page = wikipedia.page(item)
-                            doc = re.sub(r"[()\n=]", "", page.content)
-                            tokens = nlp(doc)
-                            regex_friendly_string_dep = ""
-                            regex_friendly_string_pos = ""
-                            for i in tokens:
-                                regex_friendly_string_dep += f"{i.lemma_}<<{i.dep_}>>"
-                                regex_friendly_string_pos += f"{i.lemma_}<<{i.pos_}>>"
-                            regex_friendly_string_dep = regex_friendly_string_dep.replace(
-                                "-PRON-", "")
-                            regex_friendly_string_pos = regex_friendly_string_pos.replace(
-                                "-PRON-", "")
-                            corpus.write(doc + "\n")
-                            corpus_dep.write(regex_friendly_string_dep + "\n")
-                            corpus_pos.write(regex_friendly_string_pos + "\n")
-                            # corpus.write(wikipedia.summary(pages[0]) + "\n")
-                        except KeyboardInterrupt:
-                            raise
-                        except PageError:
-                            print(f"\nno page found for {item}. skip.")
-                        except:
-                            # print("error for {}, found pages: {}".format(item, pages))
-                            print(
-                                f"\nerror for {item}, error:{sys.exc_info()[0]}")
-                            continue
+                    with open(f"{self.path}LEM_corpus-{timestamp}", "a", encoding="utf_8") as corpus_lem:
+                        for item in tqdm(self.entries):
+                            #pages = wikipedia.search(item)
+                            # if pages:
+                            try:
+                                page = wikipedia.page(item)
+                                doc = re.sub(r"[()\n=]", "", page.content)
+                                tokens = nlp(doc)
+                                regex_friendly_string_dep = ""
+                                regex_friendly_string_pos = ""
+                                regex_friendly_string_lem = ""
+                                for i in tokens:
+                                    regex_friendly_string_dep += f"{i.lemma_}<<{i.dep_}>>"
+                                    regex_friendly_string_pos += f"{i.lemma_}<<{i.pos_}>>"
+                                    regex_friendly_string_lem += f"{i.lemma_} "
+                                regex_friendly_string_dep = regex_friendly_string_dep.replace(
+                                    "-PRON-", "")
+                                regex_friendly_string_pos = regex_friendly_string_pos.replace(
+                                    "-PRON-", "")
+                                corpus.write(doc + "\n")
+                                corpus_dep.write(
+                                    regex_friendly_string_dep + "\n")
+                                corpus_pos.write(
+                                    regex_friendly_string_pos + "\n")
+                                corpus_lem.write(
+                                    regex_friendly_string_lem + "\n")
+                                # corpus.write(wikipedia.summary(pages[0]) + "\n")
+                            except KeyboardInterrupt:
+                                raise
+                            except PageError:
+                                print(f"\nno page found for {item}. skip.")
+                            except:
+                                # print("error for {}, found pages: {}".format(item, pages))
+                                print(
+                                    f"\nerror for {item}, error:{sys.exc_info()[0]}")
+                                continue
         self.entries = []
         return self
 
