@@ -44,7 +44,7 @@ if args.fact != None or args.fact_file != None:
 
 if mode is mode.FULL_PIPELINE:
     corpus = None
-    corpusPath = "./corpus-2019-12-22T14-42-29"
+    corpusPath = "./LEM_corpus-2020-01-14T11-33-46"
     if args.spacy:
         if args.fact:
             ttt = TextToTriple().text(args.fact).genTriplets()
@@ -59,7 +59,7 @@ if mode is mode.FULL_PIPELINE:
         ids, values = checker.checkWithTriples(
             args.fact_file, corpusPath, corpus)
     else:
-        corpusPath = "./corpus-2019-12-22T14-42-29"
+        corpusPath = "./LEM_corpus-2020-01-14T11-33-46"
         similarity = Similarity()
         similarity.tsv(
             "./SNLP2019_test.tsv").generate_regex(compare=20).use_regex()
@@ -106,7 +106,7 @@ if mode is Mode.BUILD_CORPUS:
     # triplets = TextToTriple().tsv(
     #     "./SNLP2019_training.tsv").genTriplets(debug=True).getTriplets()
     # corpus = TextToTriple().file(
-    #   "./DEP_corpus-2019-12-22T14-42-29", per_article=True, max_lines=10).documents
+    #   "./DEP_LEM_corpus-2020-01-14T11-33-46", per_article=True, max_lines=10).documents
     # print(len(corpus))
     # print("\n\n".join(corpus))
 
@@ -117,7 +117,7 @@ elif mode is Mode.TRIPLETS_TSV:
 
 elif mode is Mode.TRIPLETS_CORPUS:
     triplets = TextToTriple().file(
-        "./corpus-2019-12-22T14-42-29")[:100].genTriplets(debug=True).getTriplets()
+        "./LEM_corpus-2020-01-14T11-33-46")[:100].genTriplets(debug=True).getTriplets()
     pprint(triplets)
 
 elif mode is Mode.PREPROCESSING:
@@ -126,7 +126,7 @@ elif mode is Mode.PREPROCESSING:
 
 elif mode is Mode.CHECK_FACTS_ADVANCED:
     tsvPath = "./SNLP2019_test.tsv"  # "./SNLP2019_training.tsv"
-    corpusPath = "./corpus-2019-12-22T14-42-29"
+    corpusPath = "./LEM_corpus-2020-01-14T11-33-46"
     similarity = Similarity()
     similarity.tsv(tsvPath).generate_regex(compare=30).use_regex()
     checker = AdvancedChecker(similarity.expressions())
@@ -135,7 +135,7 @@ elif mode is Mode.CHECK_FACTS_ADVANCED:
 
 elif mode is Mode.CHECK_FACTS:
     tsvPath = "./SNLP2019_test.tsv"  # "./SNLP2019_training.tsv"
-    corpusPath = "./corpus-2019-12-22T14-42-29"
+    corpusPath = "./LEM_corpus-2020-01-14T11-33-46"
 
     triplets = TextToTriple().tsv(tsvPath).genTriplets().getTriplets()
     checker = AdvancedChecker(triplets)
