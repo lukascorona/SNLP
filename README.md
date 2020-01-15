@@ -1,6 +1,6 @@
 # SNLP
 
-Mini project for snlp
+Mini project for the course Statistical Natural Language Processing. The achieved result can be found [here].(http://swc2017.aksw.org/gerbil/experiment?id=202001150002)
 
 # Install:
 
