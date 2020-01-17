@@ -37,7 +37,13 @@ $ python main.py -h
 # Command line usage:
 
 The programm needs some time for startup (~26 sec). Besides the imports, it also has to load the spacy and nltk models. <br />
-Check a single fact:
+Check a single fact and save result in an output file:
+
+```
+$ python main.py -f "<some fact>" --output "./<filename>.ttl"
+```
+
+...or only print the result to the console:
 
 ```
 $ python main.py -f "<some fact>"
