@@ -75,7 +75,7 @@ if mode is mode.FULL_PIPELINE:
         else:
             ids, values = checker.check(args.fact_file, corpusPath, corpus)
 
-    if args.fact == None and args.output != None:
+    if args.output != None:
         (path, filename) = os.path.split(args.output)
         Output.path = path
         Output.generateFile(ids, values, filename)
