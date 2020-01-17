@@ -1,2 +1,0 @@
-<http://swc2017.aksw.org/task2/dataset/3401441> <http://swc2017.aksw.org/hasTruthValue> "1"^^<http://www.w3.org/2001/XMLSchema#double> .
-<http://swc2017.aksw.org/task2/dataset/3417089> <http://swc2017.aksw.org/hasTruthValue> "1"^^<http://www.w3.org/2001/XMLSchema#double> .
