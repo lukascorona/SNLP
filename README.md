@@ -26,15 +26,24 @@ $ python -m spacy download en_core_web_md
 $ python main.py --fact_file "./SNLP2019_test.tsv" --output "./result_output.ttl" --spacy
 ```
 
+# Get help
+
+Simply call:
+
+```
+$ python main.py -h
+```
+
 # Command line usage:
 
-check a single fact:
+The programm needs some time for startup (~26 sec). Besides the imports, it also has to load the spacy and nltk models. <br />
+Check a single fact:
 
 ```
 $ python main.py -f "<some fact>"
 ```
 
-check a .tsv file and save result in an output file
+Check a .tsv file and save result in an output file
 
 ```
 $ python main.py --fact_file "./<filename>.tsv" --output "./<filename>.ttl"
@@ -48,13 +57,13 @@ $ python main.py --fact_file "./<filename>.tsv"
 
 ### Options
 
-in all cases a new temporary corpus can be created, on default the prefetched corpus is used:
+In all cases a new temporary corpus can be created, but on default the prefetched corpus is used:
 
 ```
 $ python main.py ... --new_corpus
 ```
 
-and the triple generation can be switched to the spacy approach:
+And the triple generation can be switched to the spacy approach (recommended):
 
 ```
 $ python main.py ... --spacy
