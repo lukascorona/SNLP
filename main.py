@@ -45,8 +45,8 @@ if args.fact != None or args.fact_file != None:
 
 if mode is mode.FULL_PIPELINE:
     corpus = None
-    corpusPath = "./LEM_corpus-2020-01-14T11-33-46"
     if args.spacy:
+        corpusPath = "./LEM_corpus-2020-01-14T11-33-46"
         if args.fact:
             ttt = TextToTriple().text(args.fact).genTriplets()
         else:
@@ -60,7 +60,7 @@ if mode is mode.FULL_PIPELINE:
         ids, values = checker.checkWithTriples(
             args.fact_file, corpusPath, corpus)
     else:
-        corpusPath = "./LEM_corpus-2020-01-14T11-33-46"
+        corpusPath = "./corpus-2020-01-14T11-33-46"
         similarity = Similarity()
         similarity.tsv(
             "./SNLP2019_test.tsv").generate_regex(compare=20).use_regex()
@@ -127,7 +127,7 @@ elif mode is Mode.PREPROCESSING:
 
 elif mode is Mode.CHECK_FACTS_ADVANCED:
     tsvPath = "./SNLP2019_test.tsv"  # "./SNLP2019_training.tsv"
-    corpusPath = "./LEM_corpus-2020-01-14T11-33-46"
+    corpusPath = "./corpus-2020-01-14T11-33-46"
     similarity = Similarity()
     similarity.tsv(tsvPath).generate_regex(compare=30).use_regex()
     checker = AdvancedChecker(similarity.expressions())
